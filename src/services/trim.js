@@ -1,12 +1,12 @@
 import Api from "../Api";
 
 class TrimService {
-  getAll(make, model) {
-    return Api.get(`/make/${make}/model/${model}/trims`);
+  getAll(model_id) {
+    return Api.get(`/model/${model_id}/trims`);
   }
 
-  get(make, model) {
-    return Api.get(`/make/${make}`);
+  get(trim_id) {
+    return Api.get(`/trim/${trim_id}`);
   }
 }
 

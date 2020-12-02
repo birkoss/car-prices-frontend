@@ -2,19 +2,18 @@ import React from "react";
 
 import { useEffect, useState } from "react";
 
-import TrimService from "../../services/trim";
-import MakeService from "../../services/make";
-import ModelService from "../../services/model";
-import Loading from "../../components/Loading";
+import TrimService from "../services/trim";
+import MakeService from "../services/make";
+import ModelService from "../services/model";
+import Loading from "../components/Loading";
 
 import Typography from "@material-ui/core/Typography";
 
 import { Box } from "@material-ui/core";
-import TrimPrices from "../../components/TrimPrices";
+import TrimPrices from "../components/TrimPrices";
 
-const TrimsListPage = ({ match }) => {
-    const make_slug = match.params.make;
-    const model_slug = match.params.model;
+const ModelPage = ({ match }) => {
+    const model_id = match.params.model;
 
     const [isLoading, setLoading] = useState(true);
     const [make, setMake] = useState({});
@@ -24,22 +23,14 @@ const TrimsListPage = ({ match }) => {
     useEffect(() => {
         const ac = new AbortController();
 
-        MakeService.get(make_slug)
+        ModelService.get(model_id)
             .then((response) => {
-                setMake(response.data.make);
+                setModel(response.data.model);
 
-                ModelService.get(make_slug, model_slug)
+                TrimService.getAll(model_id)
                     .then((response) => {
-                        setModel(response.data.model);
-
-                        TrimService.getAll(make_slug, model_slug)
-                            .then((response) => {
-                                setTrims(response.data.trims);
-                                setLoading(false);
-                            })
-                            .catch((e) => {
-                                console.log(e);
-                            });
+                        setTrims(response.data.trims);
+                        setLoading(false);
                     })
                     .catch((e) => {
                         console.log(e);
@@ -48,9 +39,10 @@ const TrimsListPage = ({ match }) => {
             .catch((e) => {
                 console.log(e);
             });
+         
 
         return () => ac.abort();
-    }, [make_slug]);
+    }, [model_id]);
 
     if (isLoading) {
         return <Loading />;
@@ -59,7 +51,7 @@ const TrimsListPage = ({ match }) => {
     return (
         <div style={{ padding: "20px" }}>
             <Typography variant="h3" component="h1">
-                {make.name} {model.name} {model.year}
+                {model.make.name} {model.name} {model.year}
             </Typography>
 
             <Box>
@@ -71,4 +63,4 @@ const TrimsListPage = ({ match }) => {
     );
 };
 
-export default TrimsListPage;
+export default ModelPage;

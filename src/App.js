@@ -5,13 +5,13 @@ import { Switch, Route } from "react-router-dom";
 import { AppBar, Toolbar, Typography } from "@material-ui/core";
 
 import HomePage from "./pages/Home";
-import ModelsListPage from "./pages/models/List";
+import MakePage from "./pages/Make";
+import ModelPage from "./pages/Model";
 
 import Navbar from "./components/Navbar";
 import Loading from "./components/Loading";
 
 import MakeService from "./services/make";
-import TrimsListPage from "./pages/trims/List";
 
 function App() {
     const [appState, setAppState] = useState({
@@ -49,8 +49,8 @@ function App() {
             </AppBar>
             <Switch>
                 <Route exact path="/" component={HomePage} />
-                <Route path="/make/:make/trim/:model" component={TrimsListPage} />
-                <Route path="/make/:make" component={ModelsListPage} />
+                <Route path="/model/:model" component={ModelPage} />
+                <Route path="/make/:make" component={MakePage} />
                 <Route path="/about" component={HomePage} />
             </Switch>
         </div>

@@ -1,18 +1,18 @@
 import { useEffect, useState } from "react";
 
-import ModelService from "../../services/model";
-import MakeService from "../../services/make";
-import Loading from "../../components/Loading";
+import ModelService from "../services/model";
+import MakeService from "../services/make";
+import Loading from "../components/Loading";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 
-import styles from "./List.module.css";
+import styles from "./Make.module.css";
 import { Box } from "@material-ui/core";
 
-const ModelsListPage = ({ match }) => {
+const MakePage = ({ match }) => {
     const make_slug = match.params.make;
 
     const [isLoading, setLoading] = useState(true);
@@ -86,7 +86,7 @@ const ModelsListPage = ({ match }) => {
                         </CardContent>
                         <CardActions>
                             {model.years.map((year) => (
-                                <Button href={"/trim/" + year.id} key={year.slug} size="small">
+                                <Button href={"/model/" + year.id} key={year.slug} size="small">
                                     {year.year}
                                 </Button>
                             ))}
@@ -98,4 +98,4 @@ const ModelsListPage = ({ match }) => {
     );
 };
 
-export default ModelsListPage;
+export default MakePage;

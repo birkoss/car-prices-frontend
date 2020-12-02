@@ -5,8 +5,8 @@ class ModelService {
     return Api.get(`/make/${make}/models`);
   }
 
-  get(make, model) {
-    return Api.get(`/make/${make}/model/${model}`);
+  get(model) {
+    return Api.get(`/model/${model}`);
   }
 }
 
