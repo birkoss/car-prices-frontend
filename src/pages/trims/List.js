@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 
 import TrimService from "../../services/trim";
+import MakeService from "../../services/make";
+import ModelService from "../../services/model";
 import Loading from "../../components/Loading";
 import Card from "@material-ui/core/Card";
 import CardActions from "@material-ui/core/CardActions";
@@ -11,44 +13,55 @@ import Typography from "@material-ui/core/Typography";
 import { Box } from "@material-ui/core";
 
 const TrimsListPage = ({ match }) => {
-    const make = match.params.make;
-    const model = match.params.model;
+    const make_slug = match.params.make;
+    const model_slug = match.params.model;
 
-    const [appState, setAppState] = useState({
-        loading: true,
-        trims: [],
-    });
-
+    const [isLoading, setLoading] = useState(true);
+    const [make, setMake] = useState({});
+    const [model, setModel] = useState({});
+    const [trims, setTrims] = useState([]);
 
     useEffect(() => {
         const ac = new AbortController();
 
-        TrimService.getAll(make, model)
+        MakeService.get(make_slug)
             .then((response) => {
-                setAppState({
-                    loading: false,
-                    trims: response.data.trims,
-                });
+                setMake(response.data.make);
+
+                ModelService.get(make_slug, model_slug)
+                    .then((response) => {
+                        setModel(response.data.model);
+
+                        TrimService.getAll(make_slug, model_slug)
+                            .then((response) => {
+                                setTrims(response.data.trims);
+                                setLoading(false);
+                            })
+                            .catch((e) => {
+                                console.log(e);
+                            });
+                    })
+                    .catch((e) => {
+                        console.log(e);
+                    });
             })
             .catch((e) => {
                 console.log(e);
             });
 
         return () => ac.abort();
-    }, [make]);
+    }, [make_slug]);
 
-    if (appState.loading) {
+    if (isLoading) {
         return <Loading />;
     }
 
-    console.log(appState.trims);
-
     return (
         <div style={{ padding: "20px" }}>
-            <h1>{make} {model}</h1>
+            <h1>{make.name} {model.name} {model.year}</h1>
 
             <Box display="flex" flexWrap="wrap">
-                {appState.trims.map((trim) => (
+                {trims.map((trim) => (
                     <Card
                         key={trim.slug}
                         variant="outlined"

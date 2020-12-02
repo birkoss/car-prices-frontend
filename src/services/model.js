@@ -6,7 +6,7 @@ class ModelService {
   }
 
   get(make, model) {
-    return Api.get(`/make/${make}`);
+    return Api.get(`/make/${make}/model/${model}`);
   }
 }
 

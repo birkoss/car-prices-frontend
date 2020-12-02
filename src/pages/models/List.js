@@ -8,19 +8,16 @@ import CardActions from "@material-ui/core/CardActions";
 import CardContent from "@material-ui/core/CardContent";
 import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
-import TrimsListPage from "../trims/List";
 
 import styles from "./List.module.css";
-import { Box, Link } from "@material-ui/core";
+import { Box } from "@material-ui/core";
 
 const ModelsListPage = ({ match }) => {
     const make_slug = match.params.make;
 
-    const [appState, setAppState] = useState({
-        loading: true,
-        make: {},
-        models: [],
-    });
+    const [isLoading, setLoading] = useState(true);
+    const [make, setMake] = useState({});
+    const [models, setModels] = useState([]);
 
     const groupModelsPerYear = (models) => {
         let grouped_models = [];
@@ -49,14 +46,12 @@ const ModelsListPage = ({ match }) => {
 
         MakeService.get(make_slug)
             .then((response) => {
-                const make = response.data.make;
+                setMake(response.data.make);
+
                 ModelService.getAll(make_slug)
                     .then((response) => {
-                        setAppState({
-                            make: make,
-                            loading: false,
-                            models: groupModelsPerYear(response.data.models),
-                        });
+                        setModels(groupModelsPerYear(response.data.models));
+                        setLoading(false);
                     })
                     .catch((e) => {
                         console.log(e);
@@ -69,16 +64,16 @@ const ModelsListPage = ({ match }) => {
         return () => ac.abort();
     }, [make_slug]);
 
-    if (appState.loading) {
+    if (isLoading) {
         return <Loading />;
     }
 
     return (
         <div style={{ padding: "20px" }}>
-            <h1>{appState.make.name}</h1>
+            <h1>{make.name}</h1>
 
             <Box display="flex" flexWrap="wrap">
-                {appState.models.map((model) => (
+                {models.map((model) => (
                     <Card
                         className={styles.model}
                         key={model.name}
@@ -91,7 +86,7 @@ const ModelsListPage = ({ match }) => {
                         </CardContent>
                         <CardActions>
                             {model.years.map((year) => (
-                                <Button href={"/make/" + appState.make.slug + "/trim/" + year.slug} key={year.slug} size="small">
+                                <Button href={"/make/" + make.slug + "/trim/" + year.slug} key={year.slug} size="small">
                                     {year.year}
                                 </Button>
                             ))}
