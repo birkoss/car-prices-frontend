@@ -13,21 +13,21 @@ const Alert = (props) => {
             aria-labelledby="alert-dialog-title"
             aria-describedby="alert-dialog-description"
         >
-            <DialogTitle id="alert-dialog-title">
-                {props.title}
-            </DialogTitle>
+            <DialogTitle id="alert-dialog-title">{props.title}</DialogTitle>
             <DialogContent>
                 <DialogContentText id="alert-dialog-description">
                     {props.content}
                 </DialogContentText>
             </DialogContent>
-            <DialogActions>
-                {props.buttons.map((button) => (
-                    <Button onClick={button.onClick} color="primary">
-                        {button.text}
-                    </Button>
-                ))}
-            </DialogActions>
+            {props.buttons !== undefined && (
+                <DialogActions>
+                    {props.buttons.map((button) => (
+                        <Button onClick={button.onClick} color="primary">
+                            {button.text}
+                        </Button>
+                    ))}
+                </DialogActions>
+            )}
         </Dialog>
     );
 };

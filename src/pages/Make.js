@@ -15,9 +15,9 @@ import { Box } from "@material-ui/core";
 const MakePage = ({ match }) => {
     const make_slug = match.params.make;
 
-    const [isLoading, setLoading] = useState(true);
-    const [make, setMake] = useState({});
-    const [models, setModels] = useState([]);
+    const [ isLoading, setLoading ] = useState(true);
+    const [ make, setMake ] = useState({});
+    const [ models, setModels ] = useState([]);
 
     const groupModelsPerYear = (models) => {
         let grouped_models = [];
@@ -54,11 +54,11 @@ const MakePage = ({ match }) => {
                         setLoading(false);
                     })
                     .catch((e) => {
-                        console.log(e);
+                        console.log("ERREUR", e);
                     });
             })
             .catch((e) => {
-                console.log(e);
+                console.log("ERREUR", e);
             });
 
         return () => ac.abort();
@@ -71,7 +71,7 @@ const MakePage = ({ match }) => {
     return (
         <div style={{ padding: "20px" }}>
             <h1>{make.name}</h1>
-
+ 
             <Box display="flex" flexWrap="wrap">
                 {models.map((model) => (
                     <Card
@@ -94,6 +94,7 @@ const MakePage = ({ match }) => {
                     </Card>
                 ))}
             </Box>
+
         </div>
     );
 };

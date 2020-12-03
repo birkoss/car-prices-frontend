@@ -13,11 +13,11 @@ import { UserContext } from "../contexts";
 import styles from "./Login.module.css";
 
 const LoginPage = () => {
-
-    const { state, dispatch } = useContext(UserContext);
+    const { dispatch } = useContext(UserContext);
 
     const [ email, setEmail ] = useState("");
     const [ password, setPassword ] = useState("");
+    const [ error, setError ] = useState("");
 
     const login = () => {
         UserService.login(email, password)
@@ -34,7 +34,7 @@ const LoginPage = () => {
                 }
             })
             .catch((e) => {
-                console.log(e);
+                setError("Invalid email or password");
             });
     };
 
@@ -85,6 +85,9 @@ const LoginPage = () => {
                     >
                         Sign In
                     </Button>
+                    {error !== "" && (
+                        <p style={{color: "red"}}>{error}</p>
+                    )}
                 </FormControl>
             </div>
         </Container>

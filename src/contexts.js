@@ -22,8 +22,6 @@ export const UserContextReducer = (
             };
         case "LOGIN":
             try {
-                /* await  AsyncStorage.setItem("token", action.payload.token); */
-                console.log("LOGIN: " + action.payload.token);
                 localStorage.setItem("api_token", action.payload.token);
             } catch (error) {
                 console.log("UserContextReducer/AsyncStorage.setItem", error);
