@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { Box, Grid, Paper } from "@material-ui/core";
+import { Box, Button, Grid, Paper } from "@material-ui/core";
 import Toolbar from "@material-ui/core/Toolbar";
 import IconButton from "@material-ui/core/IconButton";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -10,18 +10,16 @@ import Typography from "@material-ui/core/Typography";
 import SwipeableTabs from "./SwipeableTabs";
 import Loading from "./Loading";
 
-import { formatPrice } from "../helpers";
-
 import PriceService from "../services/price";
 import Calculator from "./Calculator";
 
 const TrimPrices = (props) => {
     const { trim } = props;
 
-    const [isExpanded, setExpanded] = useState(false);
-    const [isLoading, setLoading] = useState(true);
-    const [pricesActive, setPricesActive] = useState(null);
-    const [pricesPending, setPricesPending] = useState(null);
+    const [ isExpanded, setExpanded ] = useState(false);
+    const [ isLoading, setLoading ] = useState(true);
+    const [ pricesActive, setPricesActive ] = useState(null);
+    const [ pricesPending, setPricesPending ] = useState(null);
 
     const showPrice = (prices, type) => {
         let price = null;
@@ -48,16 +46,14 @@ const TrimPrices = (props) => {
 
             PriceService.getAll(trim.id)
                 .then((response) => {
-                    setPricesActive(response.data.prices);
+                    if (response.data.prices.active && Array.isArray(response.data.prices.active) && response.data.prices.active.length === 1) {
+                        setPricesActive(response.data.prices.active.shift());
+                    }
+                    if (response.data.prices.pending && Array.isArray(response.data.prices.pending) && response.data.prices.pending.length === 1) {
+                        setPricesPending(response.data.prices.pending.shift());
+                    }
 
-                    PriceService.getAllPending(trim.id)
-                        .then((response) => {
-                            setPricesPending(response.data.prices);
-                            setLoading(false);
-                        })
-                        .catch((e) => {
-                            console.log(e);
-                        });
+                    setLoading(false);
                 })
                 .catch((e) => {
                     console.log(e);
@@ -95,9 +91,12 @@ const TrimPrices = (props) => {
                         {isExpanded && <ExpandMoreIcon />}
                         {!isExpanded && <NavigateNextIcon />}
                     </IconButton>
-                    <Typography variant="h4" key={trim.slug} component="h2">
+                    <Typography variant="h4" component="h2">
                         {trim.name}
                     </Typography>
+
+                    <div style={{flexGrow: 1}}></div>
+                    <Button variant="contained" color="primary">ACTIVATE THIS TRIM</Button>
                 </Toolbar>
 
                 {isExpanded && isLoading && <Loading inside={true} />}
