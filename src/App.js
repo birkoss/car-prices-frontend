@@ -21,14 +21,12 @@ import {
 
 import LoginPage from "./pages/Login";
 import NotFoundPage from "./pages/NotFoundPage";
+import Alert from "./components/Alert";
 
 function App() {
     const [ isLoading, setLoading ] = useState(true);
-
-    const [appState, setAppState] = useState({
-        loading: true,
-        makes: [],
-    });
+    const [ makes, setMakes ] = useState([]);
+    const [ isDialogOpen, setDialogState ] = useState(false);
 
     const [state, dispatch] = useReducer(
         UserContextReducer,
@@ -36,17 +34,16 @@ function App() {
     );
 
     const fetchMakes = () => {
-        console.log("FETCHING makes");
         const ac = new AbortController();
-        setAppState({ loading: true });
 
         MakeService.getAll()
             .then((response) => {
-                setAppState({ loading: false, makes: response.data.makes });
+                setMakes(response.data.makes);
                 setLoading(false);
             })
             .catch((e) => {
-                console.log(e);
+                setLoading(false);
+                setDialogState(true);
             });
 
         return () => ac.abort(); // Abort both fetches on unmount
@@ -78,11 +75,9 @@ function App() {
 
     useEffect(() => {
         getTokenFromStorage();
-        console.log("useEffect[]");
     }, []);
 
     useEffect(() => {
-        console.log("useEffect - state.token" + state.token);
         if (state.token !== "") {
             fetchMakes();
         }
@@ -92,7 +87,20 @@ function App() {
         return <Loading />;
     }
 
-    console.log(state.isAuthenticated, isLoading);
+    if (isDialogOpen) {
+        let buttons = [{
+            "text": "Reload",
+            "onClick": () => window.location.reload(false)
+        }];
+        return (
+            <Alert
+                title="Error while querying the API!"
+                content="An error occured while querying the API preventing the app to work."
+                buttons={buttons}
+                isOpen={isDialogOpen}
+            />
+        );
+    }
 
     return (
         <div className="App">
@@ -106,7 +114,7 @@ function App() {
                 <AppBar position="static">
                     <Toolbar>
                         <Typography variant="h6">Car Prices</Typography>
-                        <Navbar makes={appState.makes} />
+                        <Navbar makes={makes} />
                         <div style={{flexGrow: 1}} />
                         <Button color="inherit" onClick={logout}>Logout</Button>
                     </Toolbar>
