@@ -12,14 +12,15 @@ import Loading from "./Loading";
 
 import PriceService from "../services/price";
 import Calculator from "./Calculator";
+import Filler from "./Filler";
 
 const TrimPrices = (props) => {
-    const { trim } = props;
+    const { trim, pricesActive, pricesPending } = props;
 
     const [ isExpanded, setExpanded ] = useState(false);
     const [ isLoading, setLoading ] = useState(true);
-    const [ pricesActive, setPricesActive ] = useState(null);
-    const [ pricesPending, setPricesPending ] = useState(null);
+    //const [ pricesActive, setPricesActive ] = useState(null);
+    //const [ pricesPending, setPricesPending ] = useState(null);
 
     const showPrice = (prices, type) => {
         let price = null;
@@ -40,25 +41,6 @@ const TrimPrices = (props) => {
 
     const toggleTabs = () => {
         setExpanded(!isExpanded);
-
-        if (pricesActive === null && pricesPending === null) {
-            setLoading(true);
-
-            PriceService.getAll(trim.id)
-                .then((response) => {
-                    if (response.data.prices.active && Array.isArray(response.data.prices.active) && response.data.prices.active.length === 1) {
-                        setPricesActive(response.data.prices.active.shift());
-                    }
-                    if (response.data.prices.pending && Array.isArray(response.data.prices.pending) && response.data.prices.pending.length === 1) {
-                        setPricesPending(response.data.prices.pending.shift());
-                    }
-
-                    setLoading(false);
-                })
-                .catch((e) => {
-                    console.log(e);
-                });
-        }
     };
 
     const tabs = [
@@ -95,9 +77,13 @@ const TrimPrices = (props) => {
                         {trim.name}
                     </Typography>
 
-                    <div style={{flexGrow: 1}}></div>
-                    <Button variant="contained" color="primary">ACTIVATE THIS TRIM</Button>
+                    <Filler />
+                    {props.pricePending !== null && (
+                        <Button variant="contained" color="primary">ACTIVATE THIS TRIM</Button>
+                    )}
                 </Toolbar>
+
+                {props.pricesPending}
 
                 {isExpanded && isLoading && <Loading inside={true} />}
 

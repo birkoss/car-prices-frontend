@@ -19,7 +19,7 @@ const ModelPage = ({ match }) => {
     const [isLoading, setLoading] = useState(true);
     const [model, setModel] = useState({});
     const [trims, setTrims] = useState([]);
-    const [prices, setPrices] = useState(null);
+    const [ totalPricesPending, setTotalPricesPending ] = useState(0);
 
     const [validating, setValidating] = useState(false);
 
@@ -27,8 +27,10 @@ const ModelPage = ({ match }) => {
         setValidating(true);
 
         let prices_id = [];
-        prices['pending'].forEach(price => {
-            prices_id.push(price.id);
+        trims.forEach((trim) => {
+            if (trim['prices'] !== undefined && trim['prices']['pending'] !== undefined) {
+                prices_id.push(trim['prices']['pending'].id);
+            }    
         });
 
         ModelService.activatePrices(model_id, {'prices': prices_id})
@@ -44,12 +46,41 @@ const ModelPage = ({ match }) => {
     const fetchPrices = () => {
         ModelService.getPrices(model_id)
         .then((response) => {
-            setPrices(response.data.prices);
+            /* Reset prices for all trims */
+            trims.forEach((trim) => {
+                trim['prices'] = {
+                    'pending': null,
+                    'active': null
+                };
+            });
+
+            let total_pending = 0;
+            ['pending', 'active'].forEach((type) => {
+                response.data.prices[type].forEach((price) => {
+                    let trim = trims.find((trim) => trim.id === price.trim.id);
+                    if (trim !== undefined) {
+                        trim['prices'][type] = price;
+                        if (type === "pending") {
+                            total_pending++;
+                        }
+                    }
+                });
+            });
+
+            setTotalPricesPending(total_pending);
+            setLoading(false);
         })
         .catch((e) => {
             console.log(e);
         });
     }
+
+    /* Refresh prices when the trims are updated */
+    useEffect(() => {
+        if (trims.length > 0) {
+            fetchPrices();
+        }
+    }, [trims])
 
     useEffect(() => {
         const ac = new AbortController();
@@ -60,9 +91,7 @@ const ModelPage = ({ match }) => {
 
                 TrimService.getAll(model_id)
                     .then((response) => {
-                        fetchPrices();
                         setTrims(response.data.trims);
-                        setLoading(false);
                     })
                     .catch((e) => {
                         console.log(e);
@@ -88,7 +117,7 @@ const ModelPage = ({ match }) => {
 
                 <Filler />
 
-                {prices !== null && prices['pending'].length > 0 && !validating && (
+                {totalPricesPending > 0 && !validating && (
                     <Button disabled={validating} variant="contained" color="primary" onClick={activatePrices}>
                         Approuve all prices
                     </Button>
@@ -101,7 +130,7 @@ const ModelPage = ({ match }) => {
 
             <Box>
                 {trims.map((trim) => (
-                    <TrimPrices key={trim.slug} trim={trim} />
+                    <TrimPrices key={trim.slug} trim={trim} priceActive={trim.prices.active} pricePending={trim.prices.pending} />
                 ))}
             </Box>
         </div>
