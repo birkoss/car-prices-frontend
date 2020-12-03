@@ -1,5 +1,4 @@
 import { useEffect, useReducer, useState } from "react";
-
 import { Switch, Route } from "react-router-dom";
 
 import { AppBar, Toolbar, Typography } from "@material-ui/core";
@@ -19,7 +18,9 @@ import {
     UserContextInitialValues,
     UserContextReducer,
 } from "./contexts";
+
 import LoginPage from "./pages/Login";
+import NotFoundPage from "./pages/NotFoundPage";
 
 function App() {
     const [ isLoading, setLoading ] = useState(true);
@@ -114,7 +115,7 @@ function App() {
                     <Route exact path="/" component={HomePage} />
                     <Route path="/model/:model" component={ModelPage} />
                     <Route path="/make/:make" component={MakePage} />
-                    <Route path="/about" component={HomePage} />
+                    <Route component={NotFoundPage} />
                 </Switch>
                     </>
                 )}
