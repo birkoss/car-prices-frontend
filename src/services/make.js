@@ -1,7 +1,8 @@
-import Api from "../Api";
+import { Api } from "../Api";
 
 class MakeService {
     getAll() {
+        console.log("GET_ALL()");
         return Api.get("/makes");
     }
 
